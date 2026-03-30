@@ -36,11 +36,14 @@ export function useSSE<T = unknown>({
   // Keep callback refs stable so the effect doesn't need to re-run when they
   // change, which would needlessly restart the connection.
   const onMessageRef = useRef(onMessage);
-  onMessageRef.current = onMessage;
   const onOpenRef = useRef(onOpen);
-  onOpenRef.current = onOpen;
   const onErrorRef = useRef(onError);
-  onErrorRef.current = onError;
+
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+    onOpenRef.current = onOpen;
+    onErrorRef.current = onError;
+  }, [onMessage, onOpen, onError]);
 
   useEffect(() => {
     if (!url) return;
