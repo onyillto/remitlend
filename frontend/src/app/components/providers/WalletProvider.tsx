@@ -245,8 +245,9 @@ export function WalletProvider({ children }: WalletProviderProps) {
       throw new Error(normalizeWalletError(result.error));
     }
 
-    throw new Error("Failed to sign transaction or operation cancelled.");
-  }
+    if (result.signedTxXdr) {
+      return result.signedTxXdr;
+    }
 
   function disconnectWallet() {
     disconnect();
