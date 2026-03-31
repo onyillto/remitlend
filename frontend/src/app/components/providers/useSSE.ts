@@ -21,7 +21,7 @@ interface UseSSEOptions<T> {
 }
 
 /**
- * useSSE hook provides real-time updates with automatic exponential backoff 
+ * useSSE hook provides real-time updates with automatic exponential backoff
  * and a polling fallback mechanism for resilience.
  */
 export function useSSE<T>({
@@ -33,7 +33,7 @@ export function useSSE<T>({
   pollingInterval = 30000,
 }: UseSSEOptions<T>) {
   const [status, setStatus] = useState<SSEStatus>("disconnected");
-  
+
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -62,7 +62,7 @@ export function useSSE<T>({
 
   const startPolling = useCallback(() => {
     if (pollingIntervalRef.current) return;
-    
+
     setStatus("fallback");
     if (callbacks.current.onPoll) {
       callbacks.current.onPoll(); // Trigger immediate refresh
@@ -83,12 +83,12 @@ export function useSSE<T>({
 
     const connect = () => {
       if (isCancelled) return;
-      
+
       // Close existing SSE but keep polling active while attempting reconnection
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
       }
-      
+
       setStatus("connecting");
 
       const es = new EventSource(url, { withCredentials: true });
@@ -98,7 +98,7 @@ export function useSSE<T>({
         if (isCancelled) return;
         backoffRef.current = 1000; // Reset backoff on success
         setStatus("connected");
-        
+
         // Stop polling fallback once SSE is live
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
@@ -112,7 +112,9 @@ export function useSSE<T>({
         try {
           const data = JSON.parse(event.data);
           callbacks.current.onMessage(data);
-        } catch { /* Ignore malformed JSON */ }
+        } catch {
+          /* Ignore malformed JSON */
+        }
       };
 
       es.onerror = (err) => {
